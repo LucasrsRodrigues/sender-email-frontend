@@ -18,7 +18,12 @@ import {
   getTemplate,
   getTemplateHistory,
   getTemplates,
-} from "@/api"; // Ajuste o caminho conforme sua estrutura
+} from "@/api";
+
+// Novos hooks administrativos
+export * from "./admin";
+export * from "./flows";
+export * from "./webhooks";
 
 // ------------------ DASHBOARD ------------------
 export const useDashboardMetrics = (period = "24h") =>
