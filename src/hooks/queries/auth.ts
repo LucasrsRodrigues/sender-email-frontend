@@ -43,8 +43,9 @@ export const useLogin = () => {
     mutationFn: (data: LoginData) => login(data),
     onSuccess: (response) => {
       // Armazena o token
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem("tokenExpiresAt", response.data.expiresAt);
+      localStorage.setItem("authToken", response.data.accessToken);
+      localStorage.setItem("tokenExpiresAt", response.data.expiresIn);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
 
       // Invalida queries para recarregar dados
       queryClient.invalidateQueries({ queryKey: ["auth-profile"] });

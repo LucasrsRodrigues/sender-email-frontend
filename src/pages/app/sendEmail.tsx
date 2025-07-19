@@ -23,6 +23,189 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSendEmail, useTemplatePreview } from "@/hooks/mutations";
 import { useEmailStatus, useTemplates } from "@/hooks/queries";
 
+const extractVariablesFromTemplate = (templateContent: string, templateSubject: string = ""): string[] => {
+  const combinedContent = `${templateSubject} ${templateContent}`;
+  const variableRegex = /\{\{([^}]+)\}\}/g;
+  const variables = new Set<string>();
+
+  let match;
+  while ((match = variableRegex.exec(combinedContent)) !== null) {
+    const variable = match[1].trim();
+    // Remove helpers e filtros do handlebars (ex: {{#if}}, {{currency amount}})
+    if (!variable.startsWith('#') && !variable.startsWith('/') && !variable.startsWith('!')) {
+      // Pega apenas o nome da variável, ignorando helpers
+      const cleanVariable = variable.split(' ')[0];
+      variables.add(cleanVariable);
+    }
+  }
+
+  return Array.from(variables).sort();
+};
+
+// Função para gerar valor padrão baseado no nome da variável
+const generateDefaultValue = (variableName: string): string => {
+  const lowerName = variableName.toLowerCase();
+
+  if (lowerName.includes('name') || lowerName.includes('nome')) {
+    return 'João Silva';
+  }
+  if (lowerName.includes('email')) {
+    return 'joao@exemplo.com';
+  }
+  if (lowerName.includes('code') || lowerName.includes('codigo')) {
+    return '123456';
+  }
+  if (lowerName.includes('url')) {
+    return 'https://exemplo.com';
+  }
+  if (lowerName.includes('date') || lowerName.includes('data')) {
+    return new Date().toLocaleDateString('pt-BR');
+  }
+  if (lowerName.includes('phone') || lowerName.includes('telefone')) {
+    return '(11) 99999-9999';
+  }
+  if (lowerName.includes('company') || lowerName.includes('empresa')) {
+    return 'Minha Empresa';
+  }
+  if (lowerName.includes('price') || lowerName.includes('preco') || lowerName.includes('valor')) {
+    return '99.90';
+  }
+
+  return '';
+};
+
+// Componente para formulário dinâmico de variáveis
+interface DynamicVariableFormProps {
+  variables: string[];
+  values: Record<string, any>;
+  onChange: (values: Record<string, any>) => void;
+}
+
+const DynamicVariableForm: React.FC<DynamicVariableFormProps> = ({
+  variables,
+  values,
+  onChange
+}) => {
+  const handleVariableChange = (variable: string, value: any) => {
+    const newValues = { ...values };
+
+    // Suporte para variáveis aninhadas (ex: user.name)
+    if (variable.includes('.')) {
+      const parts = variable.split('.');
+      let current = newValues;
+
+      for (let i = 0; i < parts.length - 1; i++) {
+        if (!current[parts[i]]) {
+          current[parts[i]] = {};
+        }
+        current = current[parts[i]];
+      }
+
+      current[parts[parts.length - 1]] = value;
+    } else {
+      newValues[variable] = value;
+    }
+
+    onChange(newValues);
+  };
+
+  const renderVariableInput = (variable: string) => {
+    const currentValue = variable.includes('.')
+      ? variable.split('.').reduce((obj, key) => obj?.[key], values) || ''
+      : values[variable] || '';
+
+    const inputType = (() => {
+      const lowerName = variable.toLowerCase();
+      if (lowerName.includes('email')) return 'email';
+      if (lowerName.includes('url')) return 'url';
+      if (lowerName.includes('phone') || lowerName.includes('telefone')) return 'tel';
+      if (lowerName.includes('date') || lowerName.includes('data')) return 'date';
+      if (lowerName.includes('number') || lowerName.includes('numero') ||
+        lowerName.includes('price') || lowerName.includes('valor')) return 'number';
+      return 'text';
+    })();
+
+    const isTextarea = variable.toLowerCase().includes('message') ||
+      variable.toLowerCase().includes('mensagem') ||
+      variable.toLowerCase().includes('content') ||
+      variable.toLowerCase().includes('description');
+
+    return (
+      <div key={variable} className="space-y-2">
+        <Label htmlFor={variable} className="flex items-center gap-2">
+          <span className="font-medium">{variable}</span>
+          <Badge variant="outline" className="text-xs">
+            {inputType === 'email' ? 'Email' :
+              inputType === 'url' ? 'URL' :
+                inputType === 'tel' ? 'Telefone' :
+                  inputType === 'date' ? 'Data' :
+                    inputType === 'number' ? 'Número' :
+                      isTextarea ? 'Texto longo' : 'Texto'}
+          </Badge>
+        </Label>
+
+        {isTextarea ? (
+          <Textarea
+            id={variable}
+            value={currentValue}
+            onChange={(e) => handleVariableChange(variable, e.target.value)}
+            placeholder={`Digite o valor para ${variable}`}
+            rows={3}
+          />
+        ) : (
+          <Input
+            id={variable}
+            type={inputType}
+            value={currentValue}
+            onChange={(e) => handleVariableChange(variable, e.target.value)}
+            placeholder={`Digite o valor para ${variable}`}
+          />
+        )}
+      </div>
+    );
+  };
+
+  if (variables.length === 0) {
+    return (
+      <div className="text-center py-4 text-gray-500">
+        <p className="text-sm">Nenhuma variável detectada neste template</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">Variáveis Detectadas ({variables.length})</Label>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            const autoValues = variables.reduce((acc, variable) => {
+              const parts = variable.split('.');
+              if (parts.length > 1) {
+                // Para variáveis aninhadas como user.name
+                if (!acc[parts[0]]) acc[parts[0]] = {};
+                acc[parts[0]][parts[1]] = generateDefaultValue(variable);
+              } else {
+                acc[variable] = generateDefaultValue(variable);
+              }
+              return acc;
+            }, {} as Record<string, any>);
+            onChange(autoValues);
+          }}
+        >
+          Preencher Exemplos
+        </Button>
+      </div>
+
+      <div className="space-y-3">
+        {variables.map(renderVariableInput)}
+      </div>
+    </div>
+  );
+};
+
 export function SendEmailPage() {
   const [formData, setFormData] = useState({
     to: "",
@@ -34,6 +217,10 @@ export function SendEmailPage() {
 
   const [showPreview, setShowPreview] = useState(false);
   const [lastSentLogId, setLastSentLogId] = useState("");
+  const [detectedVariables, setDetectedVariables] = useState<string[]>([]);
+  const [useFormMode, setUseFormMode] = useState(true);
+  const [formVariables, setFormVariables] = useState<Record<string, any>>({});
+
 
   // Queries
   const { data: templatesData, isLoading: templatesLoading } = useTemplates();
@@ -45,6 +232,9 @@ export function SendEmailPage() {
 
   // Parse variables with error handling
   const parseVariables = () => {
+    if (useFormMode) {
+      return formVariables;
+    }
     try {
       return JSON.parse(formData.variables || "{}");
     } catch {
@@ -117,12 +307,30 @@ export function SendEmailPage() {
     }
   }, [formData.template, templates]);
 
+  useEffect(() => {
+    if (formData.template) {
+      const selectedTemplate = templates.find(t => t.name === formData.template);
+      if (selectedTemplate) {
+        const variables = extractVariablesFromTemplate(
+          selectedTemplate.content || '',
+          selectedTemplate.subject || ''
+        );
+        setDetectedVariables(variables);
+        setFormVariables({});
+      }
+    } else {
+      setDetectedVariables([]);
+      setFormVariables({});
+    }
+  }, [formData.template, templates]);
+
   const priorityOptions = [
     { value: "low", label: "Baixa", delay: "30s" },
     { value: "normal", label: "Normal", delay: "15s" },
     { value: "high", label: "Alta", delay: "5s" },
     { value: "critical", label: "Crítica", delay: "Imediato" },
   ];
+
 
   return (
     <div className="p-6">
@@ -239,26 +447,73 @@ export function SendEmailPage() {
 
                 {/* Variables */}
                 <div className="space-y-2">
-                  <Label htmlFor="variables">
-                    Variáveis (JSON)
-                    {!isValidJSON && formData.variables && (
-                      <Badge variant="destructive" className="ml-2">
-                        JSON Inválido
-                      </Badge>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="variables">
+                      Variáveis do Template
+                      {!useFormMode && !isValidJSON && formData.variables && (
+                        <Badge variant="destructive" className="ml-2">
+                          JSON Inválido
+                        </Badge>
+                      )}
+                    </Label>
+                    {detectedVariables.length > 0 && (
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-gray-500">Modo:</span>
+                        <Button
+                          variant={useFormMode ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setUseFormMode(true)}
+                        >
+                          Formulário
+                        </Button>
+                        <Button
+                          variant={!useFormMode ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setUseFormMode(false)}
+                        >
+                          JSON
+                        </Button>
+                      </div>
                     )}
-                  </Label>
-                  <Textarea
-                    id="variables"
-                    placeholder='{"name": "João", "code": "123456"}'
-                    className={`font-mono ${!isValidJSON && formData.variables ? "border-red-300" : ""}`}
-                    value={formData.variables}
-                    onChange={(e) =>
-                      setFormData({ ...formData, variables: e.target.value })
-                    }
-                    rows={4}
-                  />
+                  </div>
+
+                  {detectedVariables.length > 0 ? (
+                    useFormMode ? (
+                      <DynamicVariableForm
+                        variables={detectedVariables}
+                        values={formVariables}
+                        onChange={setFormVariables}
+                      />
+                    ) : (
+                      <Textarea
+                        id="variables"
+                        placeholder='{"name": "João", "code": "123456"}'
+                        className={`font-mono ${!isValidJSON && formData.variables ? "border-red-300" : ""}`}
+                        value={formData.variables}
+                        onChange={(e) =>
+                          setFormData({ ...formData, variables: e.target.value })
+                        }
+                        rows={4}
+                      />
+                    )
+                  ) : (
+                    <Textarea
+                      id="variables"
+                      placeholder='{"name": "João", "code": "123456"}'
+                      className={`font-mono ${!isValidJSON && formData.variables ? "border-red-300" : ""}`}
+                      value={formData.variables}
+                      onChange={(e) =>
+                        setFormData({ ...formData, variables: e.target.value })
+                      }
+                      rows={4}
+                    />
+                  )}
+
                   <p className="text-xs text-gray-500">
-                    Digite um objeto JSON válido com as variáveis do template
+                    {detectedVariables.length > 0
+                      ? `${detectedVariables.length} variável(is) detectada(s) automaticamente`
+                      : "Digite um objeto JSON válido com as variáveis do template"
+                    }
                   </p>
                 </div>
 
@@ -297,7 +552,7 @@ export function SendEmailPage() {
                       !formData.to ||
                       !formData.template ||
                       !formData.subject ||
-                      !isValidJSON ||
+                      (useFormMode ? false : !isValidJSON) ||
                       sendEmailMutation.isPending
                     }
                     className="flex-1"

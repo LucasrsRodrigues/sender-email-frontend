@@ -1,8 +1,12 @@
 import {
   Activity,
   BarChart3,
+  ChevronDown,
+  ChevronRight,
+  Eye,
   FileText,
   Globe,
+  History,
   Home,
   LogOut,
   Mail,
@@ -11,11 +15,11 @@ import {
   Shield,
   Users,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 
-// Configuração dos itens do menu
+// Configuração dos itens do menu com submenus
 const menuItems = [
   {
     path: "/",
@@ -34,6 +38,18 @@ const menuItems = [
     label: "Templates",
     icon: FileText,
     description: "Gerir templates de email",
+    submenu: [
+      {
+        path: "/templates",
+        label: "Gerenciar Templates",
+        description: "Criar e editar templates",
+      },
+      {
+        path: "/templates/preview",
+        label: "Preview Avançado",
+        description: "Testar templates com variáveis",
+      },
+    ],
   },
   {
     path: "/queues",
@@ -52,6 +68,28 @@ const menuItems = [
     label: "Configurações",
     icon: Settings,
     description: "Configurações do sistema",
+    submenu: [
+      {
+        path: "/configs",
+        label: "Configurações Básicas",
+        description: "Configurações principais",
+      },
+      {
+        path: "/configs/advanced",
+        label: "Configurações Avançadas",
+        description: "Configurações detalhadas",
+      },
+      {
+        path: "/configs/history",
+        label: "Histórico",
+        description: "Histórico de alterações",
+      },
+      {
+        path: "/admin/email-settings",
+        label: "Configurações SMTP",
+        description: "Gmail e SendGrid",
+      },
+    ],
   },
   {
     path: "/logs",
@@ -75,10 +113,31 @@ const useAuth = () => {
 export const NavigationMenu = () => {
   const location = useLocation();
   const { logout } = useAuth();
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const handleLogout = () => {
     logout();
   };
+
+  const toggleSubmenu = (path: string) => {
+    setExpandedMenus((prev) =>
+      prev.includes(path) ? prev.filter((p) => p !== path) : [...prev, path],
+    );
+  };
+
+  // Auto-expandir menu se estamos numa subpágina
+  React.useEffect(() => {
+    menuItems.forEach((item) => {
+      if (item.submenu) {
+        const hasActiveSubmenu = item.submenu.some(
+          (sub) => location.pathname === sub.path,
+        );
+        if (hasActiveSubmenu && !expandedMenus.includes(item.path)) {
+          setExpandedMenus((prev) => [...prev, item.path]);
+        }
+      }
+    });
+  }, [location.pathname]);
 
   return (
     <div className="w-64 bg-white shadow-lg h-full flex flex-col">
@@ -94,13 +153,16 @@ export const NavigationMenu = () => {
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 mt-6 px-6">
+      <nav className="flex-1 mt-6 px-6 overflow-y-auto">
         <div className="space-y-2">
           {menuItems.map((item) => (
             <NavItem
               key={item.path}
               {...item}
               isActive={location.pathname === item.path}
+              isExpanded={expandedMenus.includes(item.path)}
+              onToggle={() => toggleSubmenu(item.path)}
+              currentPath={location.pathname}
             />
           ))}
         </div>
@@ -117,14 +179,107 @@ export const NavigationMenu = () => {
   );
 };
 
-// Componente de Item de Navegação com React Router
-const NavItem = ({ path, label, icon: Icon, description, isActive }) => {
+// Componente de Item de Navegação com Submenu
+const NavItem = ({
+  path,
+  label,
+  icon: Icon,
+  description,
+  isActive,
+  submenu,
+  isExpanded,
+  onToggle,
+  currentPath,
+}) => {
+  const hasSubmenu = submenu && submenu.length > 0;
+  const hasActiveSubmenu =
+    hasSubmenu && submenu.some((sub) => currentPath === sub.path);
+  const isMainActive = isActive && !hasActiveSubmenu;
+
+  if (hasSubmenu) {
+    return (
+      <div className="space-y-1">
+        {/* Menu Principal */}
+        <div className="flex items-center">
+          <Link
+            to={path}
+            className={`flex-1 flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 group ${isMainActive
+                ? "bg-blue-100 text-blue-700 shadow-sm"
+                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+          >
+            <Icon
+              className={`w-5 h-5 transition-colors ${isMainActive
+                  ? "text-blue-600"
+                  : "text-gray-500 group-hover:text-gray-700"
+                }`}
+            />
+            <div className="flex-1">
+              <span className="font-medium block">{label}</span>
+              {!isMainActive && !hasActiveSubmenu && (
+                <div className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {description}
+                </div>
+              )}
+            </div>
+          </Link>
+
+          {/* Botão de Expandir */}
+          <button
+            onClick={onToggle}
+            className={`p-2 rounded-md transition-colors ${isExpanded || hasActiveSubmenu
+                ? "text-blue-600"
+                : "text-gray-400 hover:text-gray-600"
+              }`}
+          >
+            {isExpanded ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+
+        {/* Submenu */}
+        {(isExpanded || hasActiveSubmenu) && (
+          <div className="ml-8 space-y-1 border-l-2 border-gray-100 pl-4">
+            {submenu.map((subItem) => (
+              <Link
+                key={subItem.path}
+                to={subItem.path}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 group block ${currentPath === subItem.path
+                    ? "bg-blue-50 text-blue-700 border-l-2 border-blue-500"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
+              >
+                <div className="flex-1">
+                  <span className="text-sm font-medium block">
+                    {subItem.label}
+                  </span>
+                  {currentPath !== subItem.path && (
+                    <div className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {subItem.description}
+                    </div>
+                  )}
+                </div>
+                {currentPath === subItem.path && (
+                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Menu sem submenu (comportamento original)
   return (
     <Link
       to={path}
       className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 group block ${isActive
-        ? "bg-blue-100 text-blue-700 shadow-sm"
-        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          ? "bg-blue-100 text-blue-700 shadow-sm"
+          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
         }`}
     >
       <Icon
@@ -144,34 +299,62 @@ const NavItem = ({ path, label, icon: Icon, description, isActive }) => {
   );
 };
 
-// Componente de Breadcrumb
+// Componente de Breadcrumb Atualizado
 export const Breadcrumb = () => {
   const location = useLocation();
 
   const getBreadcrumbData = (pathname) => {
+    // Verificar submenus primeiro
+    for (const item of menuItems) {
+      if (item.submenu) {
+        const submenuItem = item.submenu.find((sub) => sub.path === pathname);
+        if (submenuItem) {
+          return {
+            parent: { label: item.label, icon: item.icon, path: item.path },
+            current: { label: submenuItem.label, icon: Eye },
+          };
+        }
+      }
+    }
+
+    // Menu principal
     const item = menuItems.find((item) => item.path === pathname);
-    if (!item) return { label: "Página", icon: Home };
-    return item;
+    if (!item) return { current: { label: "Página", icon: Home } };
+
+    return { current: { label: item.label, icon: item.icon } };
   };
 
   const breadcrumbData = getBreadcrumbData(location.pathname);
-  const Icon = breadcrumbData.icon;
 
   return (
     <div className="bg-white border-b px-6 py-4">
       <div className="flex items-center space-x-2 text-sm text-gray-600">
         <Home className="w-4 h-4" />
         <span>/</span>
-        <Icon className="w-4 h-4" />
+
+        {breadcrumbData.parent && (
+          <>
+            <Link
+              to={breadcrumbData.parent.path}
+              className="flex items-center space-x-1 hover:text-gray-900 transition-colors"
+            >
+              <breadcrumbData.parent.icon className="w-4 h-4" />
+              <span>{breadcrumbData.parent.label}</span>
+            </Link>
+            <span>/</span>
+          </>
+        )}
+
+        <breadcrumbData.current.icon className="w-4 h-4" />
         <span className="font-medium text-gray-900">
-          {breadcrumbData.label}
+          {breadcrumbData.current.label}
         </span>
       </div>
     </div>
   );
 };
 
-// Menu Mobile com React Router
+// Menu Mobile com React Router (mantido igual)
 export const MobileMenu = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const location = useLocation();
@@ -209,7 +392,7 @@ export const MobileMenu = () => {
   );
 };
 
-// Componente de Status de Conexão
+// Componente de Status de Conexão (mantido igual)
 export const ConnectionStatus = () => {
   const [isOnline, setIsOnline] = React.useState(navigator.onLine);
 

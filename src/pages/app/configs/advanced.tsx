@@ -443,9 +443,9 @@ export function AdvancedConfigPage() {
 
   const filteredConfigs = configs.filter(
     (config) =>
-      config.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      config.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      config.description.toLowerCase().includes(searchTerm.toLowerCase()),
+      config?.displayName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
+      config?.key?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
+      config?.description?.toLowerCase()?.includes(searchTerm?.toLowerCase()),
   );
 
   return (

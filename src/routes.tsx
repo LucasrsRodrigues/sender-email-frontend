@@ -1,8 +1,8 @@
-// src/routes.tsx
 import { createBrowserRouter } from "react-router";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppLayout } from "./components/layout/AppLayout";
 import { AdminDashboardPage } from "./pages/app/admin/dashboard";
+import { EmailSettingsPage } from "./pages/app/admin/emailSettings";
 import { AdminSearchPage } from "./pages/app/admin/search";
 import { AnalyticsPage } from "./pages/app/analytics";
 import { ApiKeysPage } from "./pages/app/apiKeys";
@@ -34,7 +34,11 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "send-email", element: <SendEmailPage /> },
+
+      // Templates
       { path: "templates", element: <TemplatePage /> },
+      { path: "templates/preview", element: <TemplatePreviewPage /> },
+
       { path: "flows", element: <FlowsPage /> },
       { path: "webhooks", element: <WebhooksPage /> },
       { path: "api-keys", element: <ApiKeysPage /> },
@@ -48,10 +52,24 @@ export const router = createBrowserRouter([
       },
       { path: "analytics", element: <AnalyticsPage /> },
       { path: "security/blocked-domains", element: <BlockedDomainsPage /> },
+
+      // Configurações
+      { path: "configs", element: <ConfigPage /> },
       { path: "configs/advanced", element: <AdvancedConfigPage /> },
+      { path: "configs/history", element: <ConfigHistoryPage /> },
+
+      // Admin
+      {
+        path: "admin/email-settings",
+        element: (
+          <ProtectedRoute requiredRole="SUPER_ADMIN">
+            <EmailSettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+
       { path: "queues", element: <QueuePage /> },
       { path: "security", element: <SecurityPage /> },
-      { path: "configs", element: <ConfigPage /> },
       { path: "logs", element: <LogsPage /> },
       { path: "profile", element: <ProfilePage /> },
       {
@@ -70,8 +88,6 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: "configs/history", element: <ConfigHistoryPage /> },
-      { path: "templates/preview", element: <TemplatePreviewPage /> },
     ],
   },
   {
