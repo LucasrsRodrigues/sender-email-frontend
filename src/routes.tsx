@@ -1,3 +1,4 @@
+// src/routes.tsx
 import { createBrowserRouter } from "react-router";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppLayout } from "./components/layout/AppLayout";
@@ -6,6 +7,7 @@ import { AdminSearchPage } from "./pages/app/admin/search";
 import { AnalyticsPage } from "./pages/app/analytics";
 import { ApiKeysPage } from "./pages/app/apiKeys";
 import { ConfigPage } from "./pages/app/configPage";
+import { AdvancedConfigPage } from "./pages/app/configs/advanced";
 import { Dashboard } from "./pages/app/dashboard";
 import { FlowsPage } from "./pages/app/flows";
 import { LogsPage } from "./pages/app/logsPage";
@@ -44,6 +46,7 @@ export const router = createBrowserRouter([
       },
       { path: "analytics", element: <AnalyticsPage /> },
       { path: "security/blocked-domains", element: <BlockedDomainsPage /> },
+      { path: "configs/advanced", element: <AdvancedConfigPage /> },
       { path: "queues", element: <QueuePage /> },
       { path: "security", element: <SecurityPage /> },
       { path: "configs", element: <ConfigPage /> },
