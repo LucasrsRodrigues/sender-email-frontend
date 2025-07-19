@@ -15,10 +15,10 @@ export async function removeAllowedIP(ip: string) {
   return response.data;
 }
 
-export async function getBlockedDomains() {
-  const response = await apiClient.get("/admin/config/blocked-domains");
-  return response.data;
-}
+// export async function getBlockedDomains() {
+//   const response = await apiClient.get("/admin/config/blocked-domains");
+//   return response.data;
+// }
 
 export async function addBlockedDomain(domainData: any) {
   const response = await apiClient.post("/admin/config/blocked-domains", domainData);

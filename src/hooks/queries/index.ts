@@ -18,11 +18,16 @@ import {
   getTemplate,
   getTemplateHistory,
   getTemplates,
-} from "@/api";
+} from "@/api"; // Ajuste o caminho conforme sua estrutura
 
 // Novos hooks administrativos
 export * from "./admin";
+export * from "./analytics";
+export * from "./apiKeys";
+export * from "./auth";
+export * from "./blockedDomains";
 export * from "./flows";
+export * from "./users";
 export * from "./webhooks";
 
 // ------------------ DASHBOARD ------------------
