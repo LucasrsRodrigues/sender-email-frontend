@@ -8,6 +8,7 @@ import {
   Globe,
   History,
   Home,
+  Key,
   LogOut,
   Mail,
   Send,
@@ -19,7 +20,6 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 
-// Configuração dos itens do menu com submenus
 const menuItems = [
   {
     path: "/",
@@ -50,6 +50,36 @@ const menuItems = [
         description: "Testar templates com variáveis",
       },
     ],
+  },
+  {
+    path: "/flows",
+    label: "Flows",
+    icon: Globe,
+    description: "Sequências automatizadas de emails",
+  },
+  {
+    path: "/webhooks",
+    label: "Webhooks",
+    icon: Globe,
+    description: "Integração com sistemas externos",
+  },
+  {
+    path: "/api-keys",
+    label: "API Keys",
+    icon: Key,
+    description: "Gerenciar chaves de API",
+  },
+  {
+    path: "/users",
+    label: "Usuários",
+    icon: Users,
+    description: "Gerenciar usuários do sistema",
+  },
+  {
+    path: "/analytics",
+    label: "Analytics",
+    icon: BarChart3,
+    description: "Estatísticas e relatórios",
   },
   {
     path: "/queues",
@@ -94,7 +124,7 @@ const menuItems = [
   {
     path: "/logs",
     label: "Logs",
-    icon: Users,
+    icon: History,
     description: "Logs do sistema",
   },
 ];
@@ -204,14 +234,14 @@ const NavItem = ({
           <Link
             to={path}
             className={`flex-1 flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 group ${isMainActive
-                ? "bg-blue-100 text-blue-700 shadow-sm"
-                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+              ? "bg-blue-100 text-blue-700 shadow-sm"
+              : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               }`}
           >
             <Icon
               className={`w-5 h-5 transition-colors ${isMainActive
-                  ? "text-blue-600"
-                  : "text-gray-500 group-hover:text-gray-700"
+                ? "text-blue-600"
+                : "text-gray-500 group-hover:text-gray-700"
                 }`}
             />
             <div className="flex-1">
@@ -228,8 +258,8 @@ const NavItem = ({
           <button
             onClick={onToggle}
             className={`p-2 rounded-md transition-colors ${isExpanded || hasActiveSubmenu
-                ? "text-blue-600"
-                : "text-gray-400 hover:text-gray-600"
+              ? "text-blue-600"
+              : "text-gray-400 hover:text-gray-600"
               }`}
           >
             {isExpanded ? (
@@ -248,8 +278,8 @@ const NavItem = ({
                 key={subItem.path}
                 to={subItem.path}
                 className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 group block ${currentPath === subItem.path
-                    ? "bg-blue-50 text-blue-700 border-l-2 border-blue-500"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-blue-50 text-blue-700 border-l-2 border-blue-500"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
               >
                 <div className="flex-1">
@@ -278,8 +308,8 @@ const NavItem = ({
     <Link
       to={path}
       className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 group block ${isActive
-          ? "bg-blue-100 text-blue-700 shadow-sm"
-          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+        ? "bg-blue-100 text-blue-700 shadow-sm"
+        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
         }`}
     >
       <Icon

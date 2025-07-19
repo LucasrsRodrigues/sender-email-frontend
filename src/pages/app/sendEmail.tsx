@@ -23,10 +23,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSendEmail, useTemplatePreview } from "@/hooks/mutations";
 import { useEmailStatus, useTemplates } from "@/hooks/queries";
 
-const extractVariablesFromTemplate = (templateContent: string, templateSubject: string = ""): string[] => {
+const extractVariablesFromTemplate = (
+  templateContent: string,
+  templateSubject: string = "",
+  templateVariables: any = null
+): string[] => {
+  const variables = new Set<string>();
+
+  // 1. Extrair variáveis do conteúdo e assunto ({{variable}})
   const combinedContent = `${templateSubject} ${templateContent}`;
   const variableRegex = /\{\{([^}]+)\}\}/g;
-  const variables = new Set<string>();
 
   let match;
   while ((match = variableRegex.exec(combinedContent)) !== null) {
@@ -37,6 +43,23 @@ const extractVariablesFromTemplate = (templateContent: string, templateSubject: 
       const cleanVariable = variable.split(' ')[0];
       variables.add(cleanVariable);
     }
+  }
+
+  // 2. Adicionar variáveis do campo "variables" do template (se existir)
+  if (templateVariables && typeof templateVariables === 'object') {
+    const flattenVariables = (obj: any, prefix = '') => {
+      Object.keys(obj).forEach(key => {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+        variables.add(fullKey);
+
+        // Se o valor é um objeto, flatten recursivamente (para user.name, company.address, etc.)
+        if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key]) && obj[key] !== null) {
+          flattenVariables(obj[key], fullKey);
+        }
+      });
+    };
+
+    flattenVariables(templateVariables);
   }
 
   return Array.from(variables).sort();
@@ -73,6 +96,12 @@ const generateDefaultValue = (variableName: string): string => {
 
   return '';
 };
+// Componente para formulário dinâmico de variáveis
+interface DynamicVariableFormProps {
+  variables: string[];
+  values: Record<string, any>;
+  onChange: (values: Record<string, any>) => void;
+}
 
 // Componente para formulário dinâmico de variáveis
 interface DynamicVariableFormProps {
@@ -121,14 +150,30 @@ const DynamicVariableForm: React.FC<DynamicVariableFormProps> = ({
       if (lowerName.includes('phone') || lowerName.includes('telefone')) return 'tel';
       if (lowerName.includes('date') || lowerName.includes('data')) return 'date';
       if (lowerName.includes('number') || lowerName.includes('numero') ||
-        lowerName.includes('price') || lowerName.includes('valor')) return 'number';
+        lowerName.includes('price') || lowerName.includes('valor') ||
+        lowerName.includes('amount') || lowerName.includes('quantity')) return 'number';
       return 'text';
     })();
 
     const isTextarea = variable.toLowerCase().includes('message') ||
       variable.toLowerCase().includes('mensagem') ||
       variable.toLowerCase().includes('content') ||
-      variable.toLowerCase().includes('description');
+      variable.toLowerCase().includes('description') ||
+      variable.toLowerCase().includes('body') ||
+      variable.toLowerCase().includes('text');
+
+    // Determinar placeholder baseado no nome da variável
+    const getPlaceholder = () => {
+      const lowerName = variable.toLowerCase();
+      if (lowerName.includes('name') || lowerName.includes('nome')) return 'Ex: João Silva';
+      if (lowerName.includes('email')) return 'Ex: joao@exemplo.com';
+      if (lowerName.includes('code') || lowerName.includes('codigo')) return 'Ex: 123456';
+      if (lowerName.includes('url')) return 'Ex: https://exemplo.com';
+      if (lowerName.includes('phone') || lowerName.includes('telefone')) return 'Ex: (11) 99999-9999';
+      if (lowerName.includes('company') || lowerName.includes('empresa')) return 'Ex: Minha Empresa';
+      if (lowerName.includes('amount') || lowerName.includes('valor') || lowerName.includes('price')) return 'Ex: 99.90';
+      return `Digite o valor para ${variable}`;
+    };
 
     return (
       <div key={variable} className="space-y-2">
@@ -149,7 +194,7 @@ const DynamicVariableForm: React.FC<DynamicVariableFormProps> = ({
             id={variable}
             value={currentValue}
             onChange={(e) => handleVariableChange(variable, e.target.value)}
-            placeholder={`Digite o valor para ${variable}`}
+            placeholder={getPlaceholder()}
             rows={3}
           />
         ) : (
@@ -158,7 +203,7 @@ const DynamicVariableForm: React.FC<DynamicVariableFormProps> = ({
             type={inputType}
             value={currentValue}
             onChange={(e) => handleVariableChange(variable, e.target.value)}
-            placeholder={`Digite o valor para ${variable}`}
+            placeholder={getPlaceholder()}
           />
         )}
       </div>
@@ -169,6 +214,7 @@ const DynamicVariableForm: React.FC<DynamicVariableFormProps> = ({
     return (
       <div className="text-center py-4 text-gray-500">
         <p className="text-sm">Nenhuma variável detectada neste template</p>
+        <p className="text-xs mt-1">Templates sem variáveis {{}} ou campo "variables" não geram formulário</p>
       </div>
     );
   }
@@ -176,7 +222,12 @@ const DynamicVariableForm: React.FC<DynamicVariableFormProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">Variáveis Detectadas ({variables.length})</Label>
+        <Label className="text-sm font-medium">
+          Variáveis Detectadas ({variables.length})
+          <span className="text-xs text-gray-500 font-normal ml-2">
+            • Do conteúdo/assunto • Das variáveis esperadas
+          </span>
+        </Label>
         <Button
           variant="outline"
           size="sm"
@@ -205,6 +256,7 @@ const DynamicVariableForm: React.FC<DynamicVariableFormProps> = ({
     </div>
   );
 };
+
 
 export function SendEmailPage() {
   const [formData, setFormData] = useState({
@@ -313,7 +365,8 @@ export function SendEmailPage() {
       if (selectedTemplate) {
         const variables = extractVariablesFromTemplate(
           selectedTemplate.content || '',
-          selectedTemplate.subject || ''
+          selectedTemplate.subject || '',
+          selectedTemplate.variables // Incluindo as variáveis definidas no template
         );
         setDetectedVariables(variables);
         setFormVariables({});
