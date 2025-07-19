@@ -2,7 +2,7 @@ import axios from "axios";
 import { env } from "@/env";
 
 export const apiClient = axios.create({
-  baseURL: env.VITE_API_URL || "http://localhost:3000/api",
+  baseURL: env.VITE_API_URL || "https://sender-email-backend.yexuz7.easypanel.host/api",
   headers: {
     "Content-Type": "application/json",
   },
