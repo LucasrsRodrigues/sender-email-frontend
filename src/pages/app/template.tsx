@@ -13,31 +13,31 @@ import {
   Search,
 } from "lucide-react";
 import { useState } from "react";
-import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent } from "../../components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../components/ui/dialog";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { Textarea } from "../../components/ui/textarea";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   useCreateTemplate,
   useTemplatePreview,
   useToggleTemplate,
   useUpdateTemplate,
-} from "../../hooks/mutations";
+} from "@/hooks/mutations";
 import {
   useTemplate,
   useTemplateHistory,
   useTemplates,
-} from "../../hooks/queries";
+} from "@/hooks/queries";
 
 export function TemplatePage() {
   const [searchTerm, setSearchTerm] = useState("");

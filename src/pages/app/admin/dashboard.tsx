@@ -11,24 +11,24 @@ import {
   Webhook,
 } from "lucide-react";
 import { useState } from "react";
-import { Alert, AlertDescription } from "../../../components/ui/alert";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/card";
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
-import { useAdminDashboard, useAdminStats } from "../../../hooks/queries/admin";
+} from "@/components/ui/select";
+import { useAdminDashboard, useAdminStats } from "@/hooks/queries/admin";
 
 export function AdminDashboardPage() {
   const [statsPeriod, setStatsPeriod] = useState("week");
@@ -67,7 +67,9 @@ export function AdminDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard Administrativo
+          </h1>
           <p className="text-gray-600">
             Visão geral do sistema de envio de emails
           </p>
@@ -90,12 +92,16 @@ export function AdminDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Emails</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total de Emails
+            </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardLoading ? "-" : dashboard?.overview?.totalEmails?.toLocaleString()}
+              {dashboardLoading
+                ? "-"
+                : dashboard?.overview?.totalEmails?.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
               Emails enviados até agora
@@ -110,7 +116,9 @@ export function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardLoading ? "-" : dashboard?.overview?.emailsToday?.toLocaleString()}
+              {dashboardLoading
+                ? "-"
+                : dashboard?.overview?.emailsToday?.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
               Enviados nas últimas 24h
@@ -120,7 +128,9 @@ export function AdminDashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Templates Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Templates Ativos
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -135,7 +145,9 @@ export function AdminDashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Webhooks Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Webhooks Ativos
+            </CardTitle>
             <Webhook className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -172,7 +184,11 @@ export function AdminDashboardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Status:</span>
-                  <Badge variant={dashboard?.queue.isHealthy ? "default" : "destructive"}>
+                  <Badge
+                    variant={
+                      dashboard?.queue.isHealthy ? "default" : "destructive"
+                    }
+                  >
                     {dashboard?.queue.isHealthy ? "Saudável" : "Com problemas"}
                   </Badge>
                 </div>
@@ -180,25 +196,35 @@ export function AdminDashboardPage() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Aguardando:</span>
-                    <span className="font-medium">{dashboard?.queue.waiting}</span>
+                    <span className="font-medium">
+                      {dashboard?.queue.waiting}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Processando:</span>
-                    <span className="font-medium">{dashboard?.queue.active}</span>
+                    <span className="font-medium">
+                      {dashboard?.queue.active}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Concluídos:</span>
-                    <span className="font-medium text-green-600">{dashboard?.queue.completed}</span>
+                    <span className="font-medium text-green-600">
+                      {dashboard?.queue.completed}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Falhados:</span>
-                    <span className="font-medium text-red-600">{dashboard?.queue.failed}</span>
+                    <span className="font-medium text-red-600">
+                      {dashboard?.queue.failed}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t">
                   <span className="text-sm text-gray-600">Workers Ativos:</span>
-                  <span className="font-medium">{dashboard?.queue.workers}</span>
+                  <span className="font-medium">
+                    {dashboard?.queue.workers}
+                  </span>
                 </div>
               </div>
             )}
@@ -220,13 +246,19 @@ export function AdminDashboardPage() {
             {dashboardLoading ? (
               <div className="space-y-2">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-16 bg-gray-200 rounded animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-16 bg-gray-200 rounded animate-pulse"
+                  />
                 ))}
               </div>
             ) : dashboard?.recentErrors && dashboard.recentErrors.length > 0 ? (
               <div className="space-y-3">
                 {dashboard.recentErrors.map((error, index) => (
-                  <div key={index} className="p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div
+                    key={index}
+                    className="p-3 bg-red-50 rounded-lg border border-red-200"
+                  >
                     <div className="text-sm font-medium text-red-900 truncate">
                       Para: {error.to}
                     </div>
@@ -304,7 +336,9 @@ export function AdminDashboardPage() {
                     <div className="text-2xl font-bold text-green-600">
                       {stats?.email?.successRate?.toFixed(1)}%
                     </div>
-                    <div className="text-xs text-green-800">Taxa de Sucesso</div>
+                    <div className="text-xs text-green-800">
+                      Taxa de Sucesso
+                    </div>
                   </div>
                   <div className="text-center p-3 bg-purple-50 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">
@@ -321,14 +355,27 @@ export function AdminDashboardPage() {
                   <h4 className="font-medium mb-3">Templates Mais Usados</h4>
                   <div className="space-y-2">
                     {stats.templates.slice(0, 5).map((template, index) => (
-                      <div key={template.name} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div
+                        key={template.name}
+                        className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                      >
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium">#{index + 1}</span>
+                          <span className="text-sm font-medium">
+                            #{index + 1}
+                          </span>
                           <span className="text-sm">{template.name}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-600">{template.count} envios</span>
-                          <Badge variant={template.successRate > 95 ? "default" : "secondary"}>
+                          <span className="text-sm text-gray-600">
+                            {template.count} envios
+                          </span>
+                          <Badge
+                            variant={
+                              template.successRate > 95
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
                             {template.successRate.toFixed(1)}%
                           </Badge>
                         </div>

@@ -1,37 +1,34 @@
-import {
-  FileText,
-  Mail,
-  Search,
-  User,
-  Webhook,
-  X,
-} from "lucide-react";
+import { FileText, Mail, Search, User, Webhook, X } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/card";
-import { Input } from "../../../components/ui/input";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
-import { useAdminSearch } from "../../../hooks/queries/admin";
+} from "@/components/ui/select";
+import { useAdminSearch } from "@/hooks/queries/admin";
 
 export function AdminSearchPage() {
   const [query, setQuery] = useState("");
   const [searchType, setSearchType] = useState("all");
   const [currentQuery, setCurrentQuery] = useState("");
 
-  const { data: searchData, isLoading, error } = useAdminSearch(currentQuery, searchType);
+  const {
+    data: searchData,
+    isLoading,
+    error,
+  } = useAdminSearch(currentQuery, searchType);
 
   const handleSearch = () => {
     if (query.trim().length > 2) {
@@ -84,7 +81,9 @@ export function AdminSearchPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Busca Administrativa</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Busca Administrativa
+        </h1>
         <p className="text-gray-600">
           Pesquise em todos os recursos do sistema
         </p>
@@ -159,14 +158,18 @@ export function AdminSearchPage() {
             {isLoading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-20 bg-gray-200 rounded animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-20 bg-gray-200 rounded animate-pulse"
+                  />
                 ))}
               </div>
             ) : error ? (
               <div className="text-center py-8 text-red-600">
                 Erro ao buscar. Tente novamente.
               </div>
-            ) : searchData?.data.results && searchData.data.results.length > 0 ? (
+            ) : searchData?.data.results &&
+              searchData.data.results.length > 0 ? (
               <div className="space-y-4">
                 {searchData.data.results.map((result, index) => (
                   <div
@@ -175,9 +178,7 @@ export function AdminSearchPage() {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3 flex-1">
-                        <div className="mt-1">
-                          {getIconByType(result.type)}
-                        </div>
+                        <div className="mt-1">{getIconByType(result.type)}</div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
                             <h3 className="font-medium text-gray-900 truncate">
@@ -207,7 +208,9 @@ export function AdminSearchPage() {
             ) : currentQuery && !isLoading ? (
               <div className="text-center py-12 text-gray-500">
                 <Search className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <h3 className="font-medium mb-2">Nenhum resultado encontrado</h3>
+                <h3 className="font-medium mb-2">
+                  Nenhum resultado encontrado
+                </h3>
                 <p className="text-sm">
                   Tente usar termos diferentes ou verifique a ortografia
                 </p>
@@ -237,11 +240,21 @@ export function AdminSearchPage() {
               <div>
                 <h4 className="font-medium mb-2">Tipos de conteúdo:</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• <strong>Emails:</strong> Logs de envio e histórico</li>
-                  <li>• <strong>Templates:</strong> Templates de email</li>
-                  <li>• <strong>Usuários:</strong> Contas e perfis</li>
-                  <li>• <strong>Webhooks:</strong> Configurações de webhook</li>
-                  <li>• <strong>Configurações:</strong> Settings do sistema</li>
+                  <li>
+                    • <strong>Emails:</strong> Logs de envio e histórico
+                  </li>
+                  <li>
+                    • <strong>Templates:</strong> Templates de email
+                  </li>
+                  <li>
+                    • <strong>Usuários:</strong> Contas e perfis
+                  </li>
+                  <li>
+                    • <strong>Webhooks:</strong> Configurações de webhook
+                  </li>
+                  <li>
+                    • <strong>Configurações:</strong> Settings do sistema
+                  </li>
                 </ul>
               </div>
             </div>

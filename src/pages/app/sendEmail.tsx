@@ -1,27 +1,27 @@
 import { AlertTriangle, Check, Clock, Eye, Mail, RefreshCw, Send, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
-import { Textarea } from "../../components/ui/textarea";
-import { useSendEmail, useTemplatePreview } from "../../hooks/mutations";
-import { useEmailStatus, useTemplates } from "../../hooks/queries";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useSendEmail, useTemplatePreview } from "@/hooks/mutations";
+import { useEmailStatus, useTemplates } from "@/hooks/queries";
 
 export function SendEmailPage() {
   const [formData, setFormData] = useState({

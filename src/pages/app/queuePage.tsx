@@ -15,14 +15,14 @@ import {
   Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Button } from "../../components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -30,16 +30,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../components/ui/dialog";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   useCleanQueue,
   usePauseQueue,
   useResumeQueue,
   useRetryFailedJobs,
-} from "../../hooks/mutations";
-import { useQueueStats, useQueueStatus } from "../../hooks/queries";
+} from "@/hooks/mutations";
+import { useQueueStats, useQueueStatus } from "@/hooks/queries";
 
 export function QueuePage() {
   const [retryLimit, setRetryLimit] = useState(10);

@@ -11,6 +11,10 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -18,21 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getBasicMetrics } from "../../api/metrics";
-import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
-import { useQueueStatus } from "../../hooks/queries/admin";
+import { useQueueStatus } from "@/hooks/queries/admin";
 import {
   useDashboardMetrics,
   useHealthCheckold,
-} from "../../hooks/queries/metrics";
+} from "@/hooks/queries/metrics";
+import { getBasicMetrics } from "../../api/metrics";
 
 export function Dashboard() {
   const [period, setPeriod] = useState("24h");

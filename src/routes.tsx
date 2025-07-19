@@ -8,6 +8,7 @@ import { AnalyticsPage } from "./pages/app/analytics";
 import { ApiKeysPage } from "./pages/app/apiKeys";
 import { ConfigPage } from "./pages/app/configPage";
 import { AdvancedConfigPage } from "./pages/app/configs/advanced";
+import { ConfigHistoryPage } from "./pages/app/configs/history";
 import { Dashboard } from "./pages/app/dashboard";
 import { FlowsPage } from "./pages/app/flows";
 import { LogsPage } from "./pages/app/logsPage";
@@ -17,6 +18,7 @@ import { BlockedDomainsPage } from "./pages/app/security/blockedDomains";
 import { SecurityPage } from "./pages/app/securityPage";
 import { SendEmailPage } from "./pages/app/sendEmail";
 import { TemplatePage } from "./pages/app/template";
+import { TemplatePreviewPage } from "./pages/app/templates/preview";
 import { UsersPage } from "./pages/app/users";
 import { WebhooksPage } from "./pages/app/webhooks";
 import { LoginPage } from "./pages/auth/login";
@@ -68,6 +70,8 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      { path: "configs/history", element: <ConfigHistoryPage /> },
+      { path: "templates/preview", element: <TemplatePreviewPage /> },
     ],
   },
   {

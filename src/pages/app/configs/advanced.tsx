@@ -24,16 +24,16 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "../../../components/ui/alert";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/card";
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -41,26 +41,31 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../../components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
-import { Switch } from "../../../components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { Textarea } from "../../../components/ui/textarea";
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
   useBulkUpdateConfigs,
   useConfigCategories,
@@ -71,7 +76,7 @@ import {
   useResetConfigToDefault,
   useUpdateConfig,
   useValidateConfigs,
-} from "../../../hooks/queries/advancedConfig";
+} from "@/hooks/queries/advancedConfig";
 
 export function AdvancedConfigPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -83,8 +88,10 @@ export function AdvancedConfigPage() {
   const [pendingChanges, setPendingChanges] = useState<Record<string, any>>({});
 
   // Queries
-  const { data: categoriesData, isLoading: categoriesLoading } = useConfigCategories();
-  const { data: configsData, isLoading: configsLoading } = useConfigsByCategory(selectedCategory);
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useConfigCategories();
+  const { data: configsData, isLoading: configsLoading } =
+    useConfigsByCategory(selectedCategory);
   const { data: templatesData } = useConfigTemplates();
 
   // Mutations
@@ -105,7 +112,7 @@ export function AdvancedConfigPage() {
   }
 
   const handleConfigChange = (key: string, value: any) => {
-    setPendingChanges(prev => ({
+    setPendingChanges((prev) => ({
       ...prev,
       [key]: value,
     }));
@@ -123,7 +130,7 @@ export function AdvancedConfigPage() {
       });
 
       // Remove from pending changes
-      setPendingChanges(prev => {
+      setPendingChanges((prev) => {
         const newPending = { ...prev };
         delete newPending[key];
         return newPending;
@@ -131,7 +138,9 @@ export function AdvancedConfigPage() {
 
       toast.success("Configuração atualizada com sucesso!");
     } catch (error: any) {
-      toast.error(`Erro ao atualizar configuração: ${error.response?.data?.message || error.message}`);
+      toast.error(
+        `Erro ao atualizar configuração: ${error.response?.data?.message || error.message}`,
+      );
     }
   };
 
@@ -142,10 +151,12 @@ export function AdvancedConfigPage() {
     }
 
     try {
-      const configsToUpdate = Object.entries(pendingChanges).map(([key, value]) => ({
-        key,
-        value,
-      }));
+      const configsToUpdate = Object.entries(pendingChanges).map(
+        ([key, value]) => ({
+          key,
+          value,
+        }),
+      );
 
       await bulkUpdateMutation.mutateAsync({
         configs: configsToUpdate,
@@ -154,14 +165,22 @@ export function AdvancedConfigPage() {
       });
 
       setPendingChanges({});
-      toast.success(`${configsToUpdate.length} configuração(ões) atualizada(s) com sucesso!`);
+      toast.success(
+        `${configsToUpdate.length} configuração(ões) atualizada(s) com sucesso!`,
+      );
     } catch (error: any) {
-      toast.error(`Erro na atualização em lote: ${error.response?.data?.message || error.message}`);
+      toast.error(
+        `Erro na atualização em lote: ${error.response?.data?.message || error.message}`,
+      );
     }
   };
 
   const handleResetConfig = async (key: string) => {
-    if (!confirm("Tem certeza que deseja resetar esta configuração para o valor padrão?")) {
+    if (
+      !confirm(
+        "Tem certeza que deseja resetar esta configuração para o valor padrão?",
+      )
+    ) {
       return;
     }
 
@@ -176,7 +195,9 @@ export function AdvancedConfigPage() {
 
       toast.success("Configuração resetada para o valor padrão!");
     } catch (error: any) {
-      toast.error(`Erro ao resetar configuração: ${error.response?.data?.message || error.message}`);
+      toast.error(
+        `Erro ao resetar configuração: ${error.response?.data?.message || error.message}`,
+      );
     }
   };
 
@@ -186,10 +207,14 @@ export function AdvancedConfigPage() {
       if (result.data.validationResult.isValid) {
         toast.success("Todas as configurações são válidas!");
       } else {
-        toast.warning(`${result.data.validationResult.errors.length} erro(s) de validação encontrado(s)`);
+        toast.warning(
+          `${result.data.validationResult.errors.length} erro(s) de validação encontrado(s)`,
+        );
       }
     } catch (error: any) {
-      toast.error(`Erro na validação: ${error.response?.data?.message || error.message}`);
+      toast.error(
+        `Erro na validação: ${error.response?.data?.message || error.message}`,
+      );
     }
   };
 
@@ -204,32 +229,57 @@ export function AdvancedConfigPage() {
       window.open(result.data.downloadUrl, "_blank");
       toast.success(`Exportação iniciada! Arquivo: ${result.data.filename}`);
     } catch (error: any) {
-      toast.error(`Erro na exportação: ${error.response?.data?.message || error.message}`);
+      toast.error(
+        `Erro na exportação: ${error.response?.data?.message || error.message}`,
+      );
     }
   };
 
   const getConfigIcon = (type: string) => {
     switch (type) {
-      case "BOOLEAN": return <Settings className="w-4 h-4" />;
-      case "NUMBER": return <span className="w-4 h-4 text-center text-xs font-bold">#</span>;
-      case "EMAIL": return <span className="w-4 h-4 text-center text-xs">@</span>;
-      case "URL": return <span className="w-4 h-4 text-center text-xs">🔗</span>;
-      case "PASSWORD": return <Shield className="w-4 h-4" />;
-      case "JSON": return <span className="w-4 h-4 text-center text-xs">{"{}"}</span>;
-      default: return <span className="w-4 h-4 text-center text-xs">T</span>;
+      case "BOOLEAN":
+        return <Settings className="w-4 h-4" />;
+      case "NUMBER":
+        return <span className="w-4 h-4 text-center text-xs font-bold">#</span>;
+      case "EMAIL":
+        return <span className="w-4 h-4 text-center text-xs">@</span>;
+      case "URL":
+        return <span className="w-4 h-4 text-center text-xs">🔗</span>;
+      case "PASSWORD":
+        return <Shield className="w-4 h-4" />;
+      case "JSON":
+        return <span className="w-4 h-4 text-center text-xs">{"{}"}</span>;
+      default:
+        return <span className="w-4 h-4 text-center text-xs">T</span>;
     }
   };
 
   const getConfigBadge = (config: any) => {
-    if (config.isSecret) return <Badge variant="destructive" className="text-xs">Secret</Badge>;
-    if (config.isReadOnly) return <Badge variant="secondary" className="text-xs">Read-only</Badge>;
-    if (config.isRequired) return <Badge variant="default" className="text-xs">Required</Badge>;
+    if (config.isSecret)
+      return (
+        <Badge variant="destructive" className="text-xs">
+          Secret
+        </Badge>
+      );
+    if (config.isReadOnly)
+      return (
+        <Badge variant="secondary" className="text-xs">
+          Read-only
+        </Badge>
+      );
+    if (config.isRequired)
+      return (
+        <Badge variant="default" className="text-xs">
+          Required
+        </Badge>
+      );
     return null;
   };
 
   const renderConfigInput = (config: any) => {
     const pendingValue = pendingChanges[config.key];
-    const currentValue = pendingValue !== undefined ? pendingValue : config.value;
+    const currentValue =
+      pendingValue !== undefined ? pendingValue : config.value;
     const hasChanges = pendingValue !== undefined;
 
     switch (config.type) {
@@ -238,10 +288,14 @@ export function AdvancedConfigPage() {
           <div className="flex items-center space-x-2">
             <Switch
               checked={!!currentValue}
-              onCheckedChange={(checked) => handleConfigChange(config.key, checked)}
+              onCheckedChange={(checked) =>
+                handleConfigChange(config.key, checked)
+              }
               disabled={config.isReadOnly}
             />
-            <span className="text-sm">{currentValue ? "Ativado" : "Desativado"}</span>
+            <span className="text-sm">
+              {currentValue ? "Ativado" : "Desativado"}
+            </span>
             {hasChanges && (
               <Button
                 size="sm"
@@ -281,7 +335,11 @@ export function AdvancedConfigPage() {
         return (
           <div className="space-y-2">
             <Textarea
-              value={typeof currentValue === "object" ? JSON.stringify(currentValue, null, 2) : currentValue}
+              value={
+                typeof currentValue === "object"
+                  ? JSON.stringify(currentValue, null, 2)
+                  : currentValue
+              }
               onChange={(e) => {
                 try {
                   const parsed = JSON.parse(e.target.value);
@@ -314,7 +372,9 @@ export function AdvancedConfigPage() {
             <Input
               type="number"
               value={currentValue || ""}
-              onChange={(e) => handleConfigChange(config.key, Number(e.target.value))}
+              onChange={(e) =>
+                handleConfigChange(config.key, Number(e.target.value))
+              }
               placeholder={config.metadata?.placeholder}
               disabled={config.isReadOnly}
               min={config.validation?.min}
@@ -322,7 +382,9 @@ export function AdvancedConfigPage() {
               className="flex-1"
             />
             {config.metadata?.unit && (
-              <span className="text-sm text-gray-500">{config.metadata.unit}</span>
+              <span className="text-sm text-gray-500">
+                {config.metadata.unit}
+              </span>
             )}
             {hasChanges && (
               <Button
@@ -379,10 +441,11 @@ export function AdvancedConfigPage() {
     }
   };
 
-  const filteredConfigs = configs.filter(config =>
-    config.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    config.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    config.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredConfigs = configs.filter(
+    (config) =>
+      config.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      config.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      config.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -390,7 +453,9 @@ export function AdvancedConfigPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Configurações Avançadas</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Configurações Avançadas
+          </h1>
           <p className="text-gray-600">
             Gerencie configurações detalhadas do sistema
           </p>
@@ -461,8 +526,8 @@ export function AdvancedConfigPage() {
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Você tem {Object.keys(pendingChanges).length} alteração(ões) pendente(s).
-            Não se esqueça de salvar suas mudanças.
+            Você tem {Object.keys(pendingChanges).length} alteração(ões)
+            pendente(s). Não se esqueça de salvar suas mudanças.
           </AlertDescription>
         </Alert>
       )}
@@ -481,7 +546,10 @@ export function AdvancedConfigPage() {
               {categoriesLoading ? (
                 <div className="space-y-2">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-10 bg-gray-200 rounded animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-10 bg-gray-200 rounded animate-pulse"
+                    />
                   ))}
                 </div>
               ) : (
@@ -497,8 +565,12 @@ export function AdvancedConfigPage() {
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">{category.displayName}</div>
-                          <div className="text-sm text-gray-600">{category.description}</div>
+                          <div className="font-medium">
+                            {category.displayName}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {category.description}
+                          </div>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline" className="text-xs">
@@ -522,7 +594,8 @@ export function AdvancedConfigPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>
-                    {configsData?.data?.category?.displayName || "Configurações"}
+                    {configsData?.data?.category?.displayName ||
+                      "Configurações"}
                   </CardTitle>
                   <CardDescription>
                     {configsData?.data?.category?.description}
@@ -545,7 +618,10 @@ export function AdvancedConfigPage() {
               {configsLoading ? (
                 <div className="space-y-4">
                   {[...Array(8)].map((_, i) => (
-                    <div key={i} className="h-20 bg-gray-200 rounded animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-20 bg-gray-200 rounded animate-pulse"
+                    />
                   ))}
                 </div>
               ) : filteredConfigs.length > 0 ? (
@@ -556,7 +632,9 @@ export function AdvancedConfigPage() {
                     return (
                       <div
                         key={config.key}
-                        className={`p-4 border rounded-lg ${hasChanges ? "border-blue-300 bg-blue-50" : "border-gray-200"
+                        className={`p-4 border rounded-lg ${hasChanges
+                          ? "border-blue-300 bg-blue-50"
+                          : "border-gray-200"
                           }`}
                       >
                         <div className="flex items-start justify-between mb-3">
@@ -566,7 +644,9 @@ export function AdvancedConfigPage() {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center space-x-2 mb-1">
-                                <h3 className="font-medium">{config.displayName}</h3>
+                                <h3 className="font-medium">
+                                  {config.displayName}
+                                </h3>
                                 {getConfigBadge(config)}
                                 {hasChanges && (
                                   <Badge variant="default" className="text-xs">
@@ -590,11 +670,15 @@ export function AdvancedConfigPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => setViewingHistory(config.key)}>
+                              <DropdownMenuItem
+                                onClick={() => setViewingHistory(config.key)}
+                              >
                                 <History className="w-4 h-4 mr-2" />
                                 Ver Histórico
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setEditingConfig(config.key)}>
+                              <DropdownMenuItem
+                                onClick={() => setEditingConfig(config.key)}
+                              >
                                 <Edit className="w-4 h-4 mr-2" />
                                 Editar Avançado
                               </DropdownMenuItem>
@@ -627,7 +711,8 @@ export function AdvancedConfigPage() {
 
                           {config.metadata?.restartRequired && hasChanges && (
                             <p className="text-xs text-red-600">
-                              🔄 Esta configuração requer reinicialização do serviço
+                              🔄 Esta configuração requer reinicialização do
+                              serviço
                             </p>
                           )}
                         </div>
@@ -638,9 +723,13 @@ export function AdvancedConfigPage() {
               ) : (
                 <div className="text-center py-12 text-gray-500">
                   <Settings className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                  <h3 className="font-medium mb-2">Nenhuma configuração encontrada</h3>
+                  <h3 className="font-medium mb-2">
+                    Nenhuma configuração encontrada
+                  </h3>
                   <p className="text-sm">
-                    {searchTerm ? "Tente termos diferentes" : "Selecione uma categoria"}
+                    {searchTerm
+                      ? "Tente termos diferentes"
+                      : "Selecione uma categoria"}
                   </p>
                 </div>
               )}
@@ -664,11 +753,16 @@ export function AdvancedConfigPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {templates.map((template) => (
-                <div key={template.id} className="p-4 border border-gray-200 rounded-lg">
+                <div
+                  key={template.id}
+                  className="p-4 border border-gray-200 rounded-lg"
+                >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h4 className="font-medium">{template.name}</h4>
-                      <p className="text-sm text-gray-600">{template.description}</p>
+                      <p className="text-sm text-gray-600">
+                        {template.description}
+                      </p>
                     </div>
                     {template.isDefault && (
                       <Badge variant="default" className="text-xs">
@@ -747,7 +841,9 @@ function CreateTemplateForm({
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
           placeholder="Descreva o template..."
           rows={3}
         />

@@ -1,20 +1,27 @@
-import { AlertTriangle, Eye, EyeOff, LogIn, Mail, RefreshCw } from "lucide-react";
+import {
+  AlertTriangle,
+  Eye,
+  EyeOff,
+  LogIn,
+  Mail,
+  RefreshCw,
+} from "lucide-react";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Button } from "../../components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { useAuth } from "../../contexts/AuthContext";
-import { useLogin } from "../../hooks/queries/auth";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLogin } from "@/hooks/queries/auth";
 
 export function LoginPage() {
   const [formData, setFormData] = useState({
@@ -68,22 +75,23 @@ export function LoginPage() {
       // O hook já armazena o token, agora só navega
       navigate("/");
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Erro ao fazer login";
+      const errorMessage =
+        error.response?.data?.message || error.message || "Erro ao fazer login";
       toast.error(errorMessage);
 
       // Se erro de credenciais, limpa a senha
       if (error.response?.status === 401) {
-        setFormData(prev => ({ ...prev, password: "" }));
+        setFormData((prev) => ({ ...prev, password: "" }));
       }
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
     // Remove erro do campo quando usuário começa a digitar
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -121,7 +129,9 @@ export function LoginPage() {
                   id="username"
                   type="text"
                   value={formData.username}
-                  onChange={(e) => handleInputChange("username", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("username", e.target.value)
+                  }
                   placeholder="Digite seu nome de usuário"
                   className={errors.username ? "border-red-500" : ""}
                   disabled={loginMutation.isPending}
@@ -139,9 +149,13 @@ export function LoginPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
-                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("password", e.target.value)
+                    }
                     placeholder="Digite sua senha"
-                    className={errors.password ? "border-red-500 pr-10" : "pr-10"}
+                    className={
+                      errors.password ? "border-red-500 pr-10" : "pr-10"
+                    }
                     disabled={loginMutation.isPending}
                   />
                   <Button
