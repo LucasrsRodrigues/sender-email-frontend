@@ -100,7 +100,7 @@ export function ApiKeysPage() {
     try {
       const result = await createApiKeyMutation.mutateAsync(data);
       setNewKeyData({
-        key: result.data.fullKey,
+        key: result.data.apiKey.key,
         visible: true,
       });
       toast.success("API Key criada com sucesso!");
