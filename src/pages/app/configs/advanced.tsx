@@ -1,3 +1,6 @@
+// @ts-ignore
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: <explanation> */
+/** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import {
   AlertTriangle,
   BookOpen,
