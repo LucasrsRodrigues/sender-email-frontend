@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
       {
         path: "admin/email-settings",
         element: (
-          <ProtectedRoute requiredRole="SUPER_ADMIN">
+          <ProtectedRoute requiredRole="ADMIN">
             <EmailSettingsPage />
           </ProtectedRoute>
         ),
